@@ -3,6 +3,8 @@
     <h1 class="pa-1">Result</h1>
     <v-card-title>Form Result</v-card-title>
     <v-card-item>
+
+      <!-- Preview Untuk Text Field -->
       <v-row v-for="(field, index) in fields" :key="index">
         <v-col v-if="field.type == 'TextField'" cols="12">
           <v-text-field
@@ -17,16 +19,27 @@
             :maxlength="field.Counter"
           ></v-text-field>    
         </v-col>
-        <!-- <v-col v-if="field.Type == 'TextArea'" cols="12">
+
+        <!-- Preview Untuk Text Field -->
+        <v-col v-if="field.type == 'TextArea'" cols="12">
           <v-textarea
-            :min="field.Min"
+            :min="field.MinCounter"
             :label="field.Label"
             :rules="generateRules(field)"
             :required="field.FieldRequired"
             v-model="field.DefaultValue"
             variant="outlined"
           ></v-textarea>
-        </v-col> -->
+        </v-col>
+
+        <!-- Preview Untuk Single Selection -->
+        <v-col v-if="field.type == 'SingleSelection'" cols="12">
+          <v-select
+            label="Select"
+            :items="field.Options"
+            variant="outlined"
+          ></v-select>
+        </v-col>
       </v-row>
     </v-card-item>
   </v-card>
@@ -53,14 +66,20 @@ type Field =
       type: 'TextArea'; 
       Tab: number; 
       Label: string; 
-      FieldRequired: boolean 
+      FieldRequired: boolean;
+      Rules: string;
+      DefaultValue?: string;
+      Value: string;
+      MinCounter?: number;
   }
   | 
   { 
-      type: 'Select'; 
+      type: 'SingleSelection'; 
       Tab: number; 
       Value: string; 
-      FieldRequired: boolean
+      FieldRequired: boolean;
+      Options: string[];
+      OptionsInput: string,
   }
   | 
   { 

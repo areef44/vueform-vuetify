@@ -88,26 +88,30 @@
         <!-- Tab untuk Select -->
         <v-tabs-window-item :value="3">
           <v-row v-for="(field, index) in fields" :key="index" align="center">
-            <template v-if="field.Tab === 3 && field.type === 'Select'">
+            <template v-if="field.Tab === 3 && field.type === 'SingleSelection'">
+              <v-col cols="4" class="d-flex align-center justify-center">
+                <v-text-field
+                    v-model="field.OptionsInput"
+                    label="Add Option"
+                    variant="outlined"
+                    placeholder="Enter new option"
+                    dense
+                    clearable
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4" class="d-flex align-start justify-center">
+                <v-btn @click="addOption(field)" color="primary">
+                  Add Option
+                </v-btn>
+              </v-col>
               <v-col cols="4">
-                <v-select
-                  :items="['Option 1', 'Option 2', 'Option 3']"
-                  label="Options"
-                  v-model="field.Value"
-                  variant="outlined"
-                ></v-select>
-              </v-col>
-              <v-col cols="2">
-                <v-switch v-model="field.FieldRequired" label="Required"></v-switch>
-              </v-col>
-              <v-col cols="2">
                 <v-btn @click="removeField(index)" icon>
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-col>
             </template>
           </v-row>
-          <v-btn class="mt-4" @click="addField('Select')">Add Select</v-btn>
+          <v-btn class="mt-4" @click="addField('Single Selection')">Add Select</v-btn>
         </v-tabs-window-item>
 
         <!-- Tab untuk Datepicker -->
@@ -163,14 +167,20 @@ type Field =
       type: 'TextArea'; 
       Tab: number; 
       Label: string; 
-      FieldRequired: boolean 
+      FieldRequired: boolean;
+      Rules: string;
+      Value?: string;
+      MinCounter: number;
+      Min: number;
   }
   | 
   { 
-      type: 'Select'; 
+      type: 'SingleSelection'; 
       Tab: number; 
       Value: string; 
-      FieldRequired: boolean
+      FieldRequired: boolean;
+      Options: string[];
+      OptionsInput: string; 
   }
   | 
   { 
@@ -208,16 +218,22 @@ const addField = (type: string) => {
         type: 'TextArea', 
         Tab: tabs.value, 
         Label: "", 
-        FieldRequired: false 
+        FieldRequired: false,
+        Rules: "Text",
+        Value: `model_${fields.value.length + 1}`,
+        MinCounter: 0,
+        Min: 0,
       }
     );
-  } else if (type === "Select") {
+  } else if (type === "Single Selection") {
     fields.value.push(
       { 
-        type: 'Select', 
+        type: 'SingleSelection', 
         Tab: tabs.value, 
         Value: "", 
-        FieldRequired: false 
+        FieldRequired: false,
+        Options: [],
+        OptionsInput: '',
       }
     );
   } else if (type === "Datepicker") {
@@ -246,4 +262,25 @@ watch(
   },
   { deep: true }
 );
+
+
+const items = ref<string[]>(['California', 'Colorado', 'Florida']); // Initial options
+const selectedItems = ref<string[]>([]); // Array to store selected items
+const Options = ref<string>(''); // Input for the new option
+
+// Function to add a new option
+// Tambahkan opsi baru ke field tertentu
+const addOption = (field: Field) => {
+  if (field.type === 'SingleSelection') { // Validasi tipe field
+    const newOption = (field.OptionsInput || '').trim(); // Cegah undefined
+    if (newOption && !field.Options.includes(newOption)) {
+      field.Options.push(newOption); // Tambahkan opsi baru
+      field.OptionsInput = ''; // Reset input
+    } else {
+      alert('Option is empty or already exists!');
+    }
+  } else {
+    console.error('Field type is not SingleSelection:', field);
+  }
+};
 </script>
