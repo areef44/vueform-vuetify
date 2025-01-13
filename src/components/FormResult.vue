@@ -35,7 +35,7 @@
         <!-- Preview Untuk Single Selection -->
         <v-col v-if="field.type == 'SingleSelection'" cols="12">
           <v-select
-            label="Select"
+            :label="field.Label"
             :items="field.Options"
             variant="outlined"
           ></v-select>
@@ -76,6 +76,7 @@ type Field =
   { 
       type: 'SingleSelection'; 
       Tab: number; 
+      Label: string;
       Value: string; 
       FieldRequired: boolean;
       Options: string[];

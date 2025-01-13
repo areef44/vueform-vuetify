@@ -85,11 +85,19 @@
           <v-btn class="mt-4" @click="addField('Text Area')">Add Text Area</v-btn>
         </v-tabs-window-item>
 
-        <!-- Tab untuk Select -->
+        <!-- Tab untuk Single Selecttion -->
         <v-tabs-window-item :value="3">
           <v-row v-for="(field, index) in fields" :key="index" align="center">
             <template v-if="field.Tab === 3 && field.type === 'SingleSelection'">
-              <v-col cols="4" class="d-flex align-center justify-center">
+              <v-col cols="2">
+                <v-text-field
+                  label="Label"
+                  v-model="field.Label"
+                  required
+                  variant="outlined"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3" class="d-flex align-center justify-center">
                 <v-text-field
                     v-model="field.OptionsInput"
                     label="Add Option"
@@ -99,12 +107,39 @@
                     clearable
                 ></v-text-field>
               </v-col>
-              <v-col cols="4" class="d-flex align-start justify-center">
+              <v-col cols="3" class="d-flex align-start justify-center">
                 <v-btn @click="addOption(field)" color="primary">
                   Add Option
                 </v-btn>
               </v-col>
-              <v-col cols="4">
+              <v-col cols="2" class="d-flex align-center justify-center">
+                <v-select
+                  label="Delete Option"
+                  :items="field.Options"
+                  variant="outlined"
+                  v-model="field.OptionsDelete"
+                >
+                <template v-slot:item="{ item, props }">
+                  <v-list-item
+                    v-bind="props"
+                    class="d-flex align-center justify-space-between"
+                  >
+                    <!-- Icon dan Text Sebelah -->
+                       <v-list-item-title>{{ item.field }}</v-list-item-title>
+                        <template v-slot:append>
+                          <v-icon
+                          @click.stop="onDeleteOption(field, item.value)"
+                          >
+                            mdi-close
+                          </v-icon>
+                        </template>
+                  
+                  </v-list-item>
+                </template>
+                </v-select>
+              </v-col>
+             
+              <v-col cols="2">
                 <v-btn @click="removeField(index)" icon>
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
@@ -177,10 +212,12 @@ type Field =
   { 
       type: 'SingleSelection'; 
       Tab: number; 
+      Label: string;
       Value: string; 
       FieldRequired: boolean;
       Options: string[];
       OptionsInput: string; 
+      OptionsDelete: string;
   }
   | 
   { 
@@ -231,9 +268,11 @@ const addField = (type: string) => {
         type: 'SingleSelection', 
         Tab: tabs.value, 
         Value: "", 
+        Label: "",
         FieldRequired: false,
         Options: [],
         OptionsInput: '',
+        OptionsDelete: '',
       }
     );
   } else if (type === "Datepicker") {
@@ -263,11 +302,6 @@ watch(
   { deep: true }
 );
 
-
-const items = ref<string[]>(['California', 'Colorado', 'Florida']); // Initial options
-const selectedItems = ref<string[]>([]); // Array to store selected items
-const Options = ref<string>(''); // Input for the new option
-
 // Function to add a new option
 // Tambahkan opsi baru ke field tertentu
 const addOption = (field: Field) => {
@@ -282,5 +316,11 @@ const addOption = (field: Field) => {
   } else {
     console.error('Field type is not SingleSelection:', field);
   }
+};
+
+// Function to delete option
+const onDeleteOption = (field: Field, item: string) => {
+  field.Options = field.Options.filter(option => option !== item);
+  field.OptionsDelete = '';
 };
 </script>
