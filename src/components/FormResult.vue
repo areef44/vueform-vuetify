@@ -2,8 +2,8 @@
   <v-card>
     <h1 class="pa-1">Result</h1>
     <v-card-title>Form Result</v-card-title>
+    
     <v-card-item>
-
       <!-- Preview Untuk Text Field -->
       <v-row v-for="(field, index) in fields" :key="index">
         <v-col v-if="field.type == 'TextField'" cols="12">
@@ -40,6 +40,27 @@
             variant="outlined"
           ></v-select>
         </v-col>
+
+        <!-- Preview Untuk Multiple Selection -->
+        <v-col v-if="field.type == 'MultipleSelection'" cols="12">
+          <v-select
+            :label="field.Label"
+            :items="field.Options"
+            variant="outlined"
+            multiple
+          ></v-select>
+        </v-col>
+
+
+        <v-col v-if="field.type == 'DatePicker'" cols="12">
+          <Datepicker
+                  v-model="field.DefaultValue"
+                  format="dd-mm-yyyy"
+                  :label="field.Label"
+                  :rules="[isRequired]"
+          />
+        </v-col>
+        
       </v-row>
     </v-card-item>
   </v-card>
@@ -47,6 +68,10 @@
 
 <script setup lang="ts">
 import { defineProps } from "vue";
+import Datepicker from "./external/DatePicker.vue";
+import { isRequired } from '../utils/formValidation'
+
+const date = ref('')
 
 type Field = 
   | 
@@ -84,7 +109,20 @@ type Field =
   }
   | 
   { 
-      type: 'Datepicker'; Tab: number; 
+      type: 'MultipleSelection'; 
+      Tab: number; 
+      Label: string;
+      Value: string; 
+      FieldRequired: boolean;
+      Options: string[];
+      OptionsInput: string,
+  }
+  | 
+  { 
+      type: 'DatePicker'; 
+      Tab: number;
+      Label: string;
+      DefaultValue?: string;
       Value: string | Date; 
       FieldRequired: boolean 
   };
@@ -127,4 +165,8 @@ const getFieldType = (rule: string): string => {
       return "text";
   }
 };
+
+onMounted(() => {
+  console.log('ini di result',props.fields)
+})
 </script>
